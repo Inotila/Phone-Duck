@@ -35,11 +35,10 @@ public class ChannelController {
 
     // Create a new channel
     @PostMapping("/")
-    public ResponseEntity<Channel> createChannel(@RequestBody Channel channel) {
-        // For demo purposes
-        Optional<User> user = userService.findByUsername("demoUser");
+    public ResponseEntity<Channel> createChannel(@RequestBody Channel channel, @RequestParam Long userId) {
+        Optional<User> user = userService.findById(userId);
         if (user.isPresent()) {
-            channel.setUser(user.get()); // Set the user creating the channel
+            channel.setUser(user.get());
             Channel newChannel = channelService.createChannel(channel);
             return ResponseEntity.status(HttpStatus.CREATED).body(newChannel);
         } else {
@@ -56,39 +55,40 @@ public class ChannelController {
 
     // Delete a channel
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteChannel(@PathVariable Long id) {
-        channelService.deleteChannel(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteChannel(@PathVariable Long id, @RequestParam Long userId) {
+        Optional<Channel> channel = channelService.getChannelById(id);
+        if (channel.isPresent() && channel.get().getUser().getId().equals(userId)) {
+            channelService.deleteChannel(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     // Update channel title
     @PatchMapping("/{id}")
-    public ResponseEntity<Channel> updateChannelTitle(@PathVariable Long id, @RequestBody String newTitle) {
-        Channel updatedChannel = channelService.updateChannelTitle(id, newTitle);
-        if (updatedChannel != null) {
+    public ResponseEntity<Channel> updateChannelTitle(@PathVariable Long id, @RequestBody String newTitle, @RequestParam Long userId) {
+        Optional<Channel> channel = channelService.getChannelById(id);
+        if (channel.isPresent() && channel.get().getUser().getId().equals(userId)) {
+            Channel updatedChannel = channelService.updateChannelTitle(id, newTitle);
             return ResponseEntity.ok(updatedChannel);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     // Create a message in a channel
     @PutMapping("/{id}/messages")
-    public ResponseEntity<Message> createMessage(@PathVariable Long id, @RequestBody Message message) {
+    public ResponseEntity<Message> createMessage(@PathVariable Long id, @RequestBody Message message, @RequestParam Long userId) {
         Optional<Channel> channel = channelService.getChannelById(id);
-        if (channel.isPresent()) {
-            // For demo purposes, assuming user info is sent with the request
-            Optional<User> user = userService.findByUsername("demoUser");
-            if (user.isPresent()) {
-                message.setUser(user.get()); // Set the user creating the message
-                message.setChannel(channel.get());
-                Message newMessage = messageService.createMessage(message);
-                return ResponseEntity.status(HttpStatus.CREATED).body(newMessage);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
+        Optional<User> user = userService.findById(userId);
+        if (channel.isPresent() && user.isPresent()) {
+            message.setUser(user.get());
+            message.setChannel(channel.get());
+            Message newMessage = messageService.createMessage(message);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newMessage);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -97,10 +97,5 @@ public class ChannelController {
     public ResponseEntity<List<Message>> getAllMessagesByChannelId(@PathVariable Long id) {
         List<Message> messages = messageService.getAllMessagesByChannelId(id);
         return ResponseEntity.ok(messages);
-    }
-
-    @GetMapping("/secure")
-    public ResponseEntity<String> getSecureEndpoint() {
-        return ResponseEntity.ok("You accessed a secure endpoint!");
     }
 }

@@ -66,7 +66,7 @@ There is a security concern, hashed password returned in responses
 This work is the original work of Inotila Nghaamwa, however the following resources were used to supplement:
 
 ### Code
-By Inotila, YouTube tutorial,and class material
+YouTube tutorial,and class material
 
 ### Credits
 

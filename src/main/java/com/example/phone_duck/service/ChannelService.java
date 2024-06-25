@@ -1,7 +1,6 @@
 package com.example.phone_duck.service;
 
 import com.example.phone_duck.entity.Channel;
-import com.example.phone_duck.entity.User;
 import com.example.phone_duck.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ public class ChannelService {
     }
 
     public Channel createChannel(Channel channel) {
-        // Add logic to validate user's permission
         return channelRepository.save(channel);
     }
 

@@ -1,5 +1,6 @@
 package com.example.phone_duck.controller;
 
+import com.example.phone_duck.dto.UpdateChannelTitleRequest;
 import com.example.phone_duck.entity.Channel;
 import com.example.phone_duck.entity.Message;
 import com.example.phone_duck.entity.User;
@@ -67,10 +68,10 @@ public class ChannelController {
 
     // Update channel title
     @PatchMapping("/{id}")
-    public ResponseEntity<Channel> updateChannelTitle(@PathVariable Long id, @RequestBody String newTitle, @RequestParam Long userId) {
+    public ResponseEntity<Channel> updateChannelTitle(@PathVariable Long id, @RequestBody UpdateChannelTitleRequest updateRequest) {
         Optional<Channel> channel = channelService.getChannelById(id);
-        if (channel.isPresent() && channel.get().getUser().getId().equals(userId)) {
-            Channel updatedChannel = channelService.updateChannelTitle(id, newTitle);
+        if (channel.isPresent() && channel.get().getUser().getId().equals(updateRequest.getUserId())) {
+            Channel updatedChannel = channelService.updateChannelTitle(id, updateRequest.getNewTitle());
             return ResponseEntity.ok(updatedChannel);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

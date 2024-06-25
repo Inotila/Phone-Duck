@@ -1,12 +1,9 @@
 package com.example.phone_duck.service;
 
-import com.example.phone_duck.entity.Channel;
 import com.example.phone_duck.entity.Message;
-import com.example.phone_duck.entity.User;
 import com.example.phone_duck.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +17,7 @@ public class MessageService {
     }
 
     public Message createMessage(Message message) {
-        // Add logic for validating user's permission
+
         return messageRepository.save(message);
     }
 
